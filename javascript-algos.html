@@ -1,4 +1,12 @@
+<!-- I gitignore the node_modules file, so npm intall first to get all dependency -->
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
 <h3>
     Messages App
     <button onclick="clearMessages()">
@@ -51,15 +59,29 @@
     }
 
     function initMessages() {
+        clearUserInput();
         var rootDiv = document.createElement('div');
         var messagesContainer = document.createElement('div');
         messagesContainer.id = 'messagesContainer';
         messagesContainer.style['float'] = 'left';
         document.body.appendChild(messagesContainer);
+        
+        const buttons = document.getElementsByTagName("button");
+        if(buttons){
+            for(let i =0; i<buttons.length; i++) {
+                buttons[i].className = "btn btn-success";
+            }
+        }
     }
 
     function clearMessages() {
         /*TODO CLEAR MESSAGES FROM DOCUMENT WHEN USER CLICKS THE [CLEAR MESSAGES] BUTTON */
+        const messages = document.getElementById("messagesContainer");
+        if(messages){
+            while(messages.hasChildNodes()) {
+                messages.removeChild(messages.lastChild);
+            }
+        }
         /* EXTRA CREDIT INCLUDE A SCRIPT TAG THATS FETCHES BOOTSTRAP CSS STLYINGS AND STYLE THE BUTTONS */
     }
 
@@ -82,8 +104,20 @@
         handleSpan.appendChild(handleText);
         // TODO:: EXCLUDING THE ORIGINALLY TYPED USER NAME REPLACE THIS TEXT \
         //        WITH ANY ADDITIONAL USER TEXT FROM THE ORIGIN USER TEXT MESSAGE
-        var dummyText = 'TODO:: EXCLUDING THE ORIGINALLY TYPED USER NAME REPLACE THIS TEXT \
-                         WITH ANY ADDITIONAL USER TEXT FROM THE ORIGIN USER TEXT MESSAGE';
+
+        var dummyText;
+        const userText = getUserText();
+        const start_pos = userText.indexOf('@');
+        const end_pos = userText.indexOf(' ');
+        const origin_name = userText.substr(start_pos, end_pos);
+        const modified_message = userText.replace(origin_name,' ');
+
+        if(end_pos < start_pos) {
+            dummyText = "";
+        } else {
+            dummyText= modified_message;
+        }
+
         var messageText = document.createTextNode(`${dummyText} `);
         messageDiv.appendChild(handleSpan);
         messageDiv.appendChild(messageText);
@@ -94,7 +128,7 @@
     }
     
     //TODO SET THE FLAG TO FALS ONCE YOU UNDERSTAND THE ASSIGNMENT
-    const instructionsFlag = true;
+    const instructionsFlag = false;
     if (instructionsFlag) {
         console.log(`README`);
         console.log(`
@@ -131,6 +165,37 @@
             firstName: 'Horace',
             lastName: 'Grant',
             handle: '@HGrant'
+        },
+        {
+            firstName: 'Haonan',
+            lastName: 'Chen',
+            handle: '@HChen'
+        },
+        {
+            firstName: 'Sunny',
+            lastName: 'Wang',
+            handle: '@SWang'
+        },
+        {
+            
+            firstName: 'QuanPeng',
+            lastName: 'Wu',
+            handle: '@QWu'
+        },
+        {
+            firstName: 'James',
+            lastName: 'Valle',
+            handle: '@JValle' 
+        },
+        {
+            firstName: 'Tom',
+            lastName: 'Cruise',
+            handle: '@TCruise' 
+        },
+        {
+            firstName: 'Angelina',
+            lastName: 'Jolie',
+            handle: '@AJolie' 
         }
     ];
 
@@ -149,6 +214,7 @@
     function initConstantTimeNameFileter() {
         /* EXTRA CREDIT */
     }
+
     function constantTimeNameFilter(userText) {
         /* EXTRA CREDIT :: CONVERT filterNames FUNCTION TO DO CONSTANT TIME LOOK UP.  
         THIS WILL REQUIRE initConstantTimeNameFileter ON PAGE LOAD AS WELL */
@@ -157,6 +223,7 @@
     function filterNames(userText) {
         const firstThreeChars = userText.toLowerCase().slice(1,4);
         var re = new RegExp(firstThreeChars, 'g');
+        console.log(re);
         console.log(`First three characters: ${firstThreeChars} `);
         console.log(`First three characters: ${firstThreeChars} `);
         const filteredNames = [];
@@ -185,11 +252,18 @@
             nameElm.setAttribute('class', 'filtered-name');
             var text = document.createTextNode(`${name.firstName} ${name.lastName}`);
             nameElm.appendChild(text);
+
             namesContainer.appendChild(nameElm);
             
             /* 
                 TODO :: ADD CLICK EVENT LISTENER [addEventListener] TO EACH NAME ELEMENT.
                 IF THE USER CLICKS ON A FILTERED NAME THEN THEN A MESSAGE IS OUTPUT
+            */
+           nameElm.addEventListener("click",()=>{
+               console.log(`you clicked on here`);
+               addHandleMessage(name.handle);
+           });
+           /*
                 USING THE ADD MESSAGE FUNCTION THAT REPLACES THE USER name WITH THE USER HANDLE.
                 THE addHandleMessage FUNCTION SHOULD BE INVOKED FROM INSIDE THE CALLBACK OF THE EVENT LISTENER.
 
@@ -238,18 +312,21 @@
         if (firstChar === '@') {
             console.log('filter names ...');
             const filteredNames = filterNames(userText);
+
+
             initFilteredNames(filteredNames);
         } else {
             console.log('MISSING @ IN USER TEXT');
         }
     }
+
     // TODO UPDATE THE DEBOUNCE DELAY TO MORE CLOSELY RESEMBLE USER TYPING
     document.addEventListener("DOMContentLoaded", function(event) {
         document.getElementById('inputText').addEventListener(
             'input',
             debounce(
                 searchNames,
-                20000
+                1500
             )
         );
         initDocument();
